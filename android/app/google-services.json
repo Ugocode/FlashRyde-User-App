@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "1070340794068",
+    "firebase_url": "https://flashryde-driver-default-rtdb.firebaseio.com",
+    "project_id": "flashryde-driver",
+    "storage_bucket": "flashryde-driver.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1070340794068:android:12f13e88dcdae0478a7d41",
+        "android_client_info": {
+          "package_name": "com.ugocode.drivers_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1070340794068-at2241gclrv41sfqm1r54u803nlgigcg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClAalJHNBWWd8F3b-fvaq9whITTw3pMn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1070340794068-at2241gclrv41sfqm1r54u803nlgigcg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1070340794068-19mgiduif1rq3v571l068nasi8dnntnh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ugocode.driversApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1070340794068:android:bf85cf4b8d4c166b8a7d41",
+        "android_client_info": {
+          "package_name": "com.ugocode.fusers_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1070340794068-at2241gclrv41sfqm1r54u803nlgigcg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClAalJHNBWWd8F3b-fvaq9whITTw3pMn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1070340794068-at2241gclrv41sfqm1r54u803nlgigcg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1070340794068-19mgiduif1rq3v571l068nasi8dnntnh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ugocode.driversApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
