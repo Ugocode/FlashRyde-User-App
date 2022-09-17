@@ -2,15 +2,11 @@
 
 import 'dart:async';
 
-// import 'package:drivers_app/Global/global.dart';
-// import 'package:drivers_app/Screens/bottom_navigation.dart';
-
-// import 'package:drivers_app/Screens/bottom_navigation.dart';
-// import 'package:drivers_app/Screens/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:fusers_app/Authentication/registration_screen.dart';
+
 import 'package:fusers_app/Global/global.dart';
 import 'package:fusers_app/Screens/home_page.dart';
+import 'package:fusers_app/services/assistant_methpds.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../Authentication/login_screen.dart';
@@ -25,6 +21,11 @@ class MySplashScreen extends StatefulWidget {
 class _MySplashScreenState extends State<MySplashScreen> {
   //set timer for the app to get the user or not:
   startTimer() {
+    //before the app loads
+    fireAuth.currentUser != null
+        ? AssistantMethods.readCurrentOnlineUserInfo()
+        : null;
+
     Timer(const Duration(seconds: 4), () async {
       // ignore: await_only_futures
       if (await fireAuth.currentUser != null) {
@@ -36,10 +37,8 @@ class _MySplashScreenState extends State<MySplashScreen> {
             (Route<dynamic> route) => false);
       } else {
         //Send the uuser to the login Screen:
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const RegistrationScreen()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
       }
     });
   }
