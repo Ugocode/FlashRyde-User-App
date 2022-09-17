@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fusers_app/Global/map_key.dart';
+import 'package:fusers_app/Models/predicted_places.dart';
+import 'package:fusers_app/Widgets/place_prediction_tile.dart';
+import 'package:fusers_app/services/request_assistant.dart';
 
 class SearchLocationScreen extends StatefulWidget {
   const SearchLocationScreen({Key? key}) : super(key: key);
@@ -8,6 +12,33 @@ class SearchLocationScreen extends StatefulWidget {
 }
 
 class _SearchLocationScreenState extends State<SearchLocationScreen> {
+  List<PredictionPlaces> placePredictedList = [];
+
+  void findplaceAutoCompleteSearch(String inputText) async {
+    if (inputText.length > 1) {
+      String urlAutoCompleteSearch =
+          "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey&components=country:ng";
+      var responseAutoCompleteSearch =
+          await RequestAssistant.recieveRequest(urlAutoCompleteSearch);
+
+      if (responseAutoCompleteSearch == "Failed") {
+        return;
+      }
+      if (responseAutoCompleteSearch["status"] == "OK") {
+        var placePredictions = responseAutoCompleteSearch["predictions"];
+        var placePredictionsList = (placePredictions as List)
+            .map((jsonData) => PredictionPlaces.fromJson(jsonData))
+            .toList();
+
+        //to be able to get it outside this function we need to assign it to a list
+        //outside this function by doing:
+        setState(() {
+          placePredictedList = placePredictionsList;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -15,10 +46,11 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
         backgroundColor: Colors.blueGrey,
         body: Column(
           children: [
+            //search part UI
             Container(
               height: 180,
               decoration: const BoxDecoration(
-                color: Colors.grey,
+                color: Colors.pink,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.white54,
@@ -69,7 +101,7 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                         padding: EdgeInsets.only(left: 8.0),
                         child: Icon(
                           Icons.adjust_sharp,
-                          color: Colors.red,
+                          color: Colors.black,
                         ),
                       ),
                       const SizedBox(
@@ -79,7 +111,9 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
-                            onChanged: ((valueTyped) {}),
+                            onChanged: ((valueTyped) {
+                              findplaceAutoCompleteSearch(valueTyped);
+                            }),
                             decoration: const InputDecoration(
                                 hintText: "serach here",
                                 fillColor: Colors.white,
@@ -97,7 +131,32 @@ class _SearchLocationScreenState extends State<SearchLocationScreen> {
                   )
                 ]),
               ),
-            )
+            ),
+
+            //to desplay the preditions list
+            (placePredictedList.isNotEmpty)
+                ? Expanded(
+                    child: ListView.separated(
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: placePredictedList.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: PlacePredictionTile(
+                            predictedPlaces: placePredictedList[index],
+                          ),
+                        );
+                      },
+                      separatorBuilder: ((context, index) {
+                        return const Divider(
+                          height: 1,
+                          color: Colors.grey,
+                          thickness: 1,
+                        );
+                      }),
+                    ),
+                  )
+                : Container()
           ],
         ),
       ),
