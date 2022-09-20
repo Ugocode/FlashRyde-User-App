@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
       TextEditingController();
 
   //to save the driver information to firebase datasbase we:
-  loginDriverNow() async {
+  loginUserNow() async {
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -52,12 +52,12 @@ class _LoginScreenState extends State<LoginScreen> {
     //To get the credentials from firebase:
     if (firebaseUser != null) {
       //get the database ref:
-      //and make sure only drivers can login:
-      driversRef.child("users");
+      //and make sure only users can login
+      // usersRef.child("users");
       //this specific driver can login:
-      driversRef.child(firebaseUser.uid).once().then((driverKey) {
-        final snap = driverKey.snapshot;
-        //if the driver exist:
+      usersRef.child(firebaseUser.uid).once().then((usersKey) {
+        final snap = usersKey.snapshot;
+        //if the user exist:
         if (snap.value != null) {
           //conncet users
           currentFirebaseUser = firebaseUser;
@@ -101,35 +101,43 @@ class _LoginScreenState extends State<LoginScreen> {
           backgroundColor: Colors.red);
     } else {
       //login the user:
-      loginDriverNow();
+      loginUserNow();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey[300],
+      backgroundColor: const Color.fromARGB(255, 52, 42, 245),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(
-              height: 50,
+              height: 40,
             ),
             Image.asset(
               'Assets/images/useback.png',
               height: 350,
               width: 350,
             ),
-            // const SizedBox(
-            //   height: 10,
-            // ),
             const Text(
-              'Login as a User',
+              'Flash Ryde ⚡️',
               style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 44,
                   fontWeight: FontWeight.bold,
                   fontStyle: FontStyle.italic,
                   color: Colors.pink),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            const Text(
+              'Login as a User',
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black45),
             ),
             const SizedBox(
               height: 10,
