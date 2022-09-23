@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fusers_app/Global/info_handler.dart';
 import 'package:fusers_app/Screens/spalsh%20_screen.dart';
+import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
 
@@ -11,11 +13,14 @@ void main() async {
   );
   runApp(
     MyApp(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Flash Ryde Users',
-        theme: ThemeData(primarySwatch: Colors.pink),
-        home: const MySplashScreen(),
+      child: ChangeNotifierProvider(
+        create: (context) => AppInfo(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flash Ryde Users',
+          theme: ThemeData(primarySwatch: Colors.pink),
+          home: const MySplashScreen(),
+        ),
       ),
     ),
   );
