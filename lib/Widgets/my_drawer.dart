@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fusers_app/Global/global.dart';
 import 'package:fusers_app/Screens/spalsh%20_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class MyDrawer extends StatefulWidget {
-  String? name;
-  String? email;
+  final String? name;
+  final String? email;
 
-  MyDrawer({Key? key, this.email, this.name}) : super(key: key);
+  const MyDrawer({Key? key, this.email, this.name}) : super(key: key);
 
   @override
   State<MyDrawer> createState() => _MyDrawerState();
