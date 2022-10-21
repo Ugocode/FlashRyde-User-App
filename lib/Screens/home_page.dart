@@ -1,15 +1,20 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fusers_app/Global/global.dart';
 import 'package:fusers_app/Global/info_handler.dart';
 import 'package:fusers_app/Models/active_nearby_available_drivers.dart';
+import 'package:fusers_app/Models/direction_details.dart';
 import 'package:fusers_app/Screens/search_places_screen.dart';
+import 'package:fusers_app/Screens/select_online_drivers.dart';
 import 'package:fusers_app/Widgets/my_drawer.dart';
 import 'package:fusers_app/Widgets/progress_dialog.dart';
+import 'package:fusers_app/main.dart';
 import 'package:fusers_app/services/assistant_methpds.dart';
 import 'package:fusers_app/services/geofire_assistant.dart';
 
@@ -67,6 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Set<Circle> circlesSet = {};
 
   bool activeNearbyDriverKeysLoaded = false;
+
+  BitmapDescriptor? activeNearbyIcon;
+
+  List<ActiveNearbyAvailableDrivers> onlineNearbyAvailableDriversList = [];
 
   //for Dark mode:
   blackThemeGoogleMap() {
@@ -276,11 +285,115 @@ class _MyHomePageState extends State<MyHomePage> {
   double searchLocationContainerHeight = 200.0;
   double bottomPaddingOfMap = 0;
 
+  //get drivers from the request:
+  saveRideRequestInformation() {
+    //save the reide requst information
+    //this .push generates another ride request.
+    referenceRideRequest =
+        FirebaseDatabase.instance.ref().child("All Ride Requests").push();
+
+    var originLocation =
+        Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
+
+    var destinationLocation =
+        Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+
+    //get the points for the origin:
+    Map originLocationMap = {
+      //key : value,
+      "latitude": originLocation!.locationLatitude.toString(),
+      "longitude": originLocation.locationLongitude.toString(),
+    };
+
+    //get the points for the destination:
+    Map destinationLocationMap = {
+      //key : value,
+      "latitude": destinationLocation!.locationLatitude.toString(),
+      "longitude": destinationLocation.locationLongitude.toString(),
+    };
+
+    //get the user information details:
+    Map userInformationMap = {
+      "origin": originLocationMap,
+      "destination": destinationLocationMap,
+      "time": DateTime.now().toString(),
+      "userName": userModelCurrentInfo!.name,
+      "userPhone": userModelCurrentInfo!.phone,
+      "originAddress": originLocation.locationName,
+      "destinationAddress": destinationLocation.locationName,
+      "driverId": "waiting",
+    };
+
+    referenceRideRequest!.set(userInformationMap);
+
+    //save drivers
+    onlineNearbyAvailableDriversList =
+        GeoFireAssistant.activeNearbyAvailableDriversList;
+    searchNearrestOnlineDrivers();
+  }
+
+  //TODO
+  //Rember to change the driver spelling in the registration and select online drivers page
+
+  //function to get online driver information:
+  retrieveOnlineDriverInformation(List onlineNearestDriversList) async {
+    for (int i = 0; i < onlineNearestDriversList.length; i++) {
+      await driversRef
+          .child(onlineNearestDriversList[i].driverId.toString())
+          .once()
+          .then((dataSnapshot) {
+        var driverInfoKey = dataSnapshot.snapshot.value;
+
+        //to get all the driver details displayed:
+        dList.add(driverInfoKey);
+      });
+    }
+  }
+
+  searchNearrestOnlineDrivers() async {
+    //when no active driver available:
+    if (onlineNearbyAvailableDriversList.isEmpty) {
+      //cancle/ delete the RideRequest information
+      referenceRideRequest!.remove();
+
+      setState(() {
+        ployLineSet.clear();
+        markesSet.clear();
+        circlesSet.clear();
+        pLineCoOrdinatesList.clear();
+      });
+      //if there are no available drivers online:
+      Fluttertoast.showToast(
+          msg:
+              "No Online Driver Available yet, search again after some time.. Restarting App..");
+
+      Future.delayed(const Duration(milliseconds: 4000), () {
+        MyApp.restartApp(context);
+      });
+
+      return;
+    }
+
+    //if active driver is available:
+    await retrieveOnlineDriverInformation(onlineNearbyAvailableDriversList);
+
+    if (!mounted) {}
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SelectNearestActiveDriverScreen(
+                referenceRideRequest: referenceRideRequest)));
+  }
+
   @override
   Widget build(BuildContext context) {
     //create a variable for the address:
     var mypickupLocation = Provider.of<AppInfo>(context).userPickUpLocation;
-    var mydropOffLocation = Provider.of<AppInfo>(context).userDropOffLocation;
+    var mydropOffLocation =
+        Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+
+    //marker icon for drivers:
+    createActiveDriverIconMarker();
 
     return Scaffold(
       key: sKey,
@@ -320,7 +433,7 @@ class _MyHomePageState extends State<MyHomePage> {
               locateUserPosition();
             },
           ),
-          //custom ahambuger buttion for drawer
+          //custom hambuger button for drawer
           Positioned(
             top: 36,
             left: 22,
@@ -440,7 +553,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                                 Text(
                                   mydropOffLocation != null
-                                      ? "${(mydropOffLocation.locationName)}..."
+                                      ? "${mydropOffLocation.locationName}..."
                                       : "find Location",
                                   style: const TextStyle(
                                       color: Colors.grey, fontSize: 14),
@@ -464,9 +577,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       ElevatedButton(
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Colors.blueGrey)),
-                        onPressed: () {},
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.green)),
+                        onPressed: () {
+                          if (mydropOffLocation != null) {
+                            //contact nearby drivers:
+                            saveRideRequestInformation();
+                          } else {
+                            Fluttertoast.showToast(
+                                msg: "Please select destination Location");
+                          }
+                        },
                         child: const Text(
                           'Request a Ride',
                           style: TextStyle(fontWeight: FontWeight.bold),
@@ -499,13 +620,17 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context,
         builder: (context) {
           return const ProgressDialog(
-            message: "calm down...",
+            message: "Calm down...",
           );
         });
 
     var directionDetailsInfo =
         await AssistantMethods.obtainOriginToDestinationDirectionDetails(
             originLatLng, destinationLatLng);
+    //get the directions info and assign it to the Trip direction:
+    setState(() {
+      tripDirectiondetailsInfo = directionDetailsInfo;
+    });
 
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
@@ -644,6 +769,8 @@ class _MyHomePageState extends State<MyHomePage> {
           //whenever any driver become offline:
           case Geofire.onKeyExited:
             GeoFireAssistant.deleteOfflineDriverFromList(map['key']);
+
+            displayActiveDriversOnUsersMap();
             break;
           //whenever the driver moves - update driver location:
           case Geofire.onKeyMoved:
@@ -660,6 +787,7 @@ class _MyHomePageState extends State<MyHomePage> {
           //display those online or active drivers on users map:
           case Geofire.onGeoQueryReady:
             // All Intial Data is loaded
+            activeNearbyDriverKeysLoaded = true;
             displayActiveDriversOnUsersMap();
 
             break;
@@ -685,15 +813,26 @@ class _MyHomePageState extends State<MyHomePage> {
         Marker marker = Marker(
           markerId: MarkerId(eachDriver.driverId!),
           position: eachDriverActivePosition,
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          icon: activeNearbyIcon!,
+          infoWindow: const InfoWindow(title: "I am a driver"),
           rotation: 360,
         );
+        //for the drivers to enter the set:
         driversMarkerSet.add(marker);
       }
       setState(() {
         markesSet = driversMarkerSet;
       });
     });
+  }
+
+  createActiveDriverIconMarker() {
+    if (activeNearbyIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: const Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, "Assets/images/carloc.png")
+          .then((value) => {activeNearbyIcon = value});
+    }
   }
 }
