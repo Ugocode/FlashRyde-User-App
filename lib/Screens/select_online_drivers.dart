@@ -1,12 +1,17 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:fusers_app/Global/global.dart';
-import 'package:fusers_app/Models/direction_details.dart';
+
 import 'package:fusers_app/services/assistant_methpds.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class SelectNearestActiveDriverScreen extends StatefulWidget {
-  const SelectNearestActiveDriverScreen({super.key});
+  DatabaseReference? referenceRideRequest;
+
+  SelectNearestActiveDriverScreen({super.key, this.referenceRideRequest});
 
   @override
   State<SelectNearestActiveDriverScreen> createState() =>
@@ -58,8 +63,10 @@ class _SelectNearestActiveDriverScreenState
         leading: IconButton(
             onPressed: (() {
               //delete the write request from the database:
-              Navigator.pop(context);
-              //SystemNavigator.pop();
+              widget.referenceRideRequest!.remove();
+              // Navigator.pop(context);
+              Fluttertoast.showToast(msg: "you have cancled the ride request");
+              SystemNavigator.pop();
             }),
             icon: const Icon(
               Icons.close,
