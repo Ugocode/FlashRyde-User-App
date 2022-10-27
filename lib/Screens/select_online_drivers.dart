@@ -76,84 +76,93 @@ class _SelectNearestActiveDriverScreenState
       body: ListView.builder(
         itemCount: dList.length,
         itemBuilder: (BuildContext context, int index) {
-          return Card(
-            color: Colors.grey,
-            elevation: 3,
-            shadowColor: Colors.green,
-            margin: const EdgeInsets.all(10),
-            child: ListTile(
-              leading: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Image.asset(
-                  "Assets/images/${dList[index]["Car_details"]["type"]}.png",
-                  width: 70,
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                chosenDriverId = dList[index]['driverID'].toString();
+              });
+              //get the driver choosed and pass it to the homepage:
+              Navigator.pop(context, "driverChoosed");
+            },
+            child: Card(
+              color: Colors.grey,
+              elevation: 3,
+              shadowColor: Colors.green,
+              margin: const EdgeInsets.all(10),
+              child: ListTile(
+                leading: Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Image.asset(
+                    "Assets/images/${dList[index]["Car_details"]["type"]}.png",
+                    width: 70,
+                  ),
                 ),
-              ),
-              title: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                title: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        dList[index]["diverName"],
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      Text(
+                        dList[index]["Car_details"]["car_model"],
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white54,
+                        ),
+                      ),
+                      SmoothStarRating(
+                        rating: 3.5,
+                        color: Colors.black,
+                        borderColor: Colors.black,
+                        allowHalfRating: true,
+                        starCount: 5,
+                        size: 15,
+                      ),
+                    ],
+                  ),
+                ),
+
+                //to Show the Price and destinbation and duration:
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      dList[index]["diverName"],
+                      "₦${getFareAmountAccordingToVehicleType(index)}",
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(
+                      height: 2,
                     ),
                     Text(
-                      dList[index]["Car_details"]["car_model"],
+                      tripDirectiondetailsInfo != null
+                          ? tripDirectiondetailsInfo!.distanceText!
+                          : "",
                       style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white54,
-                      ),
+                          //fontWeight: FontWeight.bold,
+                          ),
                     ),
-                    SmoothStarRating(
-                      rating: 3.5,
-                      color: Colors.black,
-                      borderColor: Colors.black,
-                      allowHalfRating: true,
-                      starCount: 5,
-                      size: 15,
+                    const SizedBox(
+                      height: 2,
+                    ),
+                    Text(
+                      tripDirectiondetailsInfo != null
+                          ? tripDirectiondetailsInfo!.durationText!
+                          : "",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 12),
                     ),
                   ],
                 ),
-              ),
-
-              //to Show the Price and destinbation and duration:
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "₦${getFareAmountAccordingToVehicleType(index)}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    tripDirectiondetailsInfo != null
-                        ? tripDirectiondetailsInfo!.distanceText!
-                        : "",
-                    style: const TextStyle(
-                        //fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  Text(
-                    tripDirectiondetailsInfo != null
-                        ? tripDirectiondetailsInfo!.durationText!
-                        : "",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black54,
-                        fontSize: 12),
-                  ),
-                ],
               ),
             ),
           );
