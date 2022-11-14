@@ -71,4 +71,19 @@ class AssistantMethods {
 
     return directionDetailsInfo;
   }
+
+  //To cakaculate each fare and distance traveld by the user
+  static double calculateDistanceFareAmountFromOriginToDestination(
+      DirectionDetailsInfo directionDetailsInfo) {
+    double timeTravelFareAmountPerMinute =
+        (directionDetailsInfo.durationValue! / 60) * 100;
+    double distanceTravelFareAmountPerKilomiter =
+        (directionDetailsInfo.distanceValue! / 1000) * 100;
+
+    double totalFareAmount =
+        timeTravelFareAmountPerMinute + distanceTravelFareAmountPerKilomiter;
+    // double localCurrencyTotalFare = totalFareAmount * 450; //if you want to convert to local currency
+
+    return double.parse(totalFareAmount.toStringAsFixed(2)); // 23.123456
+  }
 }
