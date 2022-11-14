@@ -9,9 +9,9 @@ import 'package:fusers_app/services/assistant_methpds.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 class SelectNearestActiveDriverScreen extends StatefulWidget {
-  DatabaseReference? referenceRideRequest;
+final  DatabaseReference? referenceRideRequest;
 
-  SelectNearestActiveDriverScreen({super.key, this.referenceRideRequest});
+const  SelectNearestActiveDriverScreen({super.key, this.referenceRideRequest});
 
   @override
   State<SelectNearestActiveDriverScreen> createState() =>

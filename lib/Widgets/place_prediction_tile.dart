@@ -56,7 +56,7 @@ class PlacePredictionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(primary: Colors.blueGrey),
+      style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
       onPressed: (() {
         getPlaceDirectionDetails(predictedPlaces!.placeId!, context);
       }),
